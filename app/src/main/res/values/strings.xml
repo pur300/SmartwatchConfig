@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Smartwatch configuration</string>
+    <string name="actionRefreshTitle">Refresh bt devices</string>
+</resources>

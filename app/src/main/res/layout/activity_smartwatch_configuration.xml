@@ -19,7 +19,7 @@
     <Switch
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enable SMS notifications"
+        android:text="@string/smsNotifSwitchText"
         android:id="@+id/smsNotifSwitch"
         android:layout_below="@+id/btDevicesDropdown"
         android:layout_marginTop="50dp"
@@ -28,7 +28,7 @@
     <Switch
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enable SMS notifications"
+        android:text="@string/callsNotifSwitchText"
         android:id="@+id/callsNotifSwitch"
         android:layout_below="@+id/smsNotifSwitch"
         android:layout_marginTop="50dp"
@@ -37,7 +37,7 @@
     <Switch
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enable SMS notifications"
+        android:text="@string/emailNotifSwitchText"
         android:id="@+id/emailNotifSwitch"
         android:layout_below="@+id/callsNotifSwitch"
         android:layout_marginTop="50dp"

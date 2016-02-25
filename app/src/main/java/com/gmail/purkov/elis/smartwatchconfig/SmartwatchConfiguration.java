@@ -48,21 +48,19 @@ public class SmartwatchConfiguration extends AppCompatActivity implements Adapte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_smartwatch_configuration);
-
-        // Set event listeners for switches
-        ((Switch) findViewById(R.id.smsNotifSwitch)).setOnCheckedChangeListener(this);
-        ((Switch) findViewById(R.id.callsNotifSwitch)).setOnCheckedChangeListener(this);
-        ((Switch) findViewById(R.id.emailNotifSwitch)).setOnCheckedChangeListener(this);
-
-        // Set event listener for spinner
-        ((Spinner) findViewById(R.id.btDevicesDropdown)).setOnItemSelectedListener(this);
 
         // Get configuration data from shared preferences
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         ((Switch) findViewById(R.id.smsNotifSwitch)).setChecked(sharedPref.getBoolean("smsNotifications", false));
         ((Switch) findViewById(R.id.callsNotifSwitch)).setChecked(sharedPref.getBoolean("callsNotifications", false));
         ((Switch) findViewById(R.id.emailNotifSwitch)).setChecked(sharedPref.getBoolean("emailNotifications", false));
+
+        // Set event listeners for switches
+        ((Switch) findViewById(R.id.smsNotifSwitch)).setOnCheckedChangeListener(this);
+        ((Switch) findViewById(R.id.callsNotifSwitch)).setOnCheckedChangeListener(this);
+        ((Switch) findViewById(R.id.emailNotifSwitch)).setOnCheckedChangeListener(this);
 
         // Init variables
         btDeviceList = (Spinner) findViewById(R.id.btDevicesDropdown);
@@ -78,7 +76,7 @@ public class SmartwatchConfiguration extends AppCompatActivity implements Adapte
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
                 BluetoothDevice btDevice = result.getDevice();
-                if (!btDevices.contains(btDevice)) {
+                if (btDevice.getBondState() == BluetoothDevice.BOND_BONDED && !btDevices.contains(btDevice)) {
                     btDevices.add(btDevice);
                     btDevicesAdapter.add(btDevice.getName());
                 }
@@ -116,11 +114,13 @@ public class SmartwatchConfiguration extends AppCompatActivity implements Adapte
 
         if (!btScanStarted) {
             btScanStarted = true;
-            // Stop service
-            stopService(new Intent(this, BluetoothService.class));
+            // Set event listener for spinner to null
+            ((Spinner) findViewById(R.id.btDevicesDropdown)).setOnItemSelectedListener(null);
             // Clear list of all available bt devices
             btDevicesAdapter.clear();
             btDevices.clear();
+            // Add initial text
+            btDevicesAdapter.add("Select bluetooth device");
             btDeviceList.setAdapter(btDevicesAdapter);
             // Run scanning sequence for SCAN_PERIOD of time
             btScanner.startScan(scFilters, scSettings, btScanCallback);
@@ -130,9 +130,9 @@ public class SmartwatchConfiguration extends AppCompatActivity implements Adapte
                     btScanner.stopScan(btScanCallback);
                     // Enable scan button
                     btDeviceList.setAdapter(btDevicesAdapter);
+                    // Set event listener for spinner
+                    ((Spinner) findViewById(R.id.btDevicesDropdown)).setOnItemSelectedListener(SmartwatchConfiguration.this);
                     btScanStarted = false;
-                    // Start service again
-                    startService(new Intent(getApplicationContext(), BluetoothService.class));
                 }
             }, SCAN_PERIOD);
         }
@@ -179,12 +179,14 @@ public class SmartwatchConfiguration extends AppCompatActivity implements Adapte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // Save changes into shared preferences
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("deviceMac", btDevices.get(position).getAddress());
+        if(position > 0) {
+            // Save changes into shared preferences
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("deviceMac", btDevices.get(position - 1).getAddress());
 
-        editor.commit();
+            editor.commit();
+        }
     }
 
     @Override

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Smartwatch configuration</string>
     <string name="actionRefreshTitle">Refresh bt devices</string>
+    <string name="smsNotifSwitchText">Enable SMS notifications</string>
+    <string name="callsNotifSwitchText">Enable missed calls notifications</string>
+    <string name="emailNotifSwitchText">Enable email notifications</string>
 </resources>
